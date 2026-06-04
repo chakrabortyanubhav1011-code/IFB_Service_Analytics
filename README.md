@@ -172,5 +172,5 @@ Connect to MySQL → localhost → ifb_service_analytics → Open Dashboard/.twb
 Built as a portfolio project to demonstrate end-to-end data analytics capability using real service operations data from IFB Industries.
 
 **Author:** Anubhav Chakraborty  
-**LinkedIn:** [Your LinkedIn URL]  
-**Google Data Analytics Certificate:** [Your Coursera Certificate URL]
+**LinkedIn:** [https://www.linkedin.com/in/anubhav-chakraborty-analyst/]  
+**Google Data Analytics Certificate:** [https://coursera.org/share/a0183dd0523660090c1ee7eae9cda821]
