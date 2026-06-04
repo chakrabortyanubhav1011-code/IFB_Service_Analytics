@@ -1,0 +1,136 @@
+CREATE DATABASE IF NOT EXISTS ifb_service_analytics;
+USE ifb_service_analytics;
+CREATE TABLE IF NOT EXISTS pending_calls (
+    ticket_no VARCHAR(50),
+    customer_code VARCHAR(50),
+    customer_name VARCHAR(100),
+    branch_name VARCHAR(100),
+    franchise_name VARCHAR(100),
+    product VARCHAR(50),
+    model VARCHAR(100),
+    technician_name VARCHAR(100),
+    service_type VARCHAR(50),
+    status VARCHAR(50),
+    pending_reason VARCHAR(100),
+    call_book_date DATETIME,
+    scheduled_date DATETIME,
+    repeat_call_flag VARCHAR(10)
+);
+CREATE TABLE IF NOT EXISTS call_closure (
+    ticket_no VARCHAR(50),
+    customer_code VARCHAR(50),
+    product VARCHAR(50),
+    service_type VARCHAR(50),
+    technician_name VARCHAR(100),
+    call_book_date DATETIME,
+    closure_date DATETIME,
+    tat_hours FLOAT,
+    status VARCHAR(50),
+    closure_reason VARCHAR(100)
+);
+CREATE TABLE customer_satisfaction (
+    ticket_no VARCHAR(50),
+    customer_name VARCHAR(100),
+    technician_name VARCHAR(100),
+    franchise VARCHAR(100),
+    branch VARCHAR(100),
+    product VARCHAR(50),
+    css_score INT,
+    feedback VARCHAR(100),
+    feedback_date DATE,
+    repeat_complaint VARCHAR(10)
+);
+SET GLOBAL local_infile = 1;
+LOAD DATA LOCAL INFILE '"D:\IFB-Service-Analytics\Data\Cleaned\pending_calls_cleaned.csv"'
+INTO TABLE pending_calls
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+DROP TABLE pending_calls;
+CREATE TABLE pending_calls (
+    branch_name VARCHAR(100),
+    franchise_name VARCHAR(100),
+    ticket_no VARCHAR(50),
+    customer_code VARCHAR(50),
+    customer_name VARCHAR(100),
+    pincode VARCHAR(20),
+    call_type VARCHAR(50),
+    product VARCHAR(50),
+    model VARCHAR(100),
+    serial_number VARCHAR(100),
+    machine_status VARCHAR(50),
+    service_type VARCHAR(50),
+    call_book_date DATETIME,
+    scheduled_date DATETIME,
+    technician_name VARCHAR(100),
+    pending_reason VARCHAR(100),
+    status VARCHAR(50),
+    repeat_call_flag VARCHAR(10)
+);
+SELECT COUNT(*) FROM pending_calls;
+LOAD DATA LOCAL INFILE 'D:/IFB-Service-Analytics/Data/Cleaned/pending_calls_cleaned.csv'
+INTO TABLE pending_calls
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+SHOW TABLES;
+SELECT * FROM pending_calls
+LIMIT 10;
+SELECT COUNT(*) FROM pending_calls;
+SELECT scheduled_date
+FROM pending_calls
+LIMIT 5;
+
+CREATE TABLE dim_branch (
+    branch_id INT AUTO_INCREMENT PRIMARY KEY,
+    branch_name VARCHAR(100)
+);
+
+CREATE TABLE dim_franchise (
+    franchise_id INT AUTO_INCREMENT PRIMARY KEY,
+    franchise_name VARCHAR(100)
+);
+
+CREATE TABLE dim_product (
+    product_id INT AUTO_INCREMENT PRIMARY KEY,
+    product VARCHAR(50),
+    model VARCHAR(100)
+);
+
+CREATE TABLE dim_technician (
+    technician_id INT AUTO_INCREMENT PRIMARY KEY,
+    technician_name VARCHAR(100)
+);
+
+CREATE TABLE fact_pending_calls (
+    fact_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    ticket_no BIGINT,
+    customer_code BIGINT,
+
+    branch_id INT,
+    franchise_id INT,
+    product_id INT,
+    technician_id INT,
+
+    customer_name VARCHAR(100),
+    pincode INT,
+    call_type VARCHAR(50),
+    serial_number BIGINT,
+    machine_status VARCHAR(50),
+    service_type VARCHAR(50),
+
+    call_book_date DATETIME,
+    scheduled_date DATETIME,
+
+    pending_reason VARCHAR(100),
+    status VARCHAR(50),
+    repeat_call_flag VARCHAR(10),
+
+    FOREIGN KEY (branch_id) REFERENCES dim_branch(branch_id),
+    FOREIGN KEY (franchise_id) REFERENCES dim_franchise(franchise_id),
+    FOREIGN KEY (product_id) REFERENCES dim_product(product_id),
+    FOREIGN KEY (technician_id) REFERENCES dim_technician(technician_id)
+);
