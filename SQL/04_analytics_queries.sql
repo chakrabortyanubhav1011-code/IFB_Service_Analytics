@@ -1,0 +1,76 @@
+/* PENDING CALLS BY BRANCH */
+SELECT 
+    b.branch_name,
+    COUNT(*) AS total_pending_calls
+FROM fact_pending_calls f
+JOIN dim_branch b
+ON f.branch_id = b.branch_id
+GROUP BY b.branch_name
+ORDER BY total_pending_calls DESC;
+/* TECHNICIAN WORKLOAD */
+SELECT 
+    t.technician_name,
+    COUNT(*) AS assigned_calls
+FROM fact_pending_calls f
+JOIN dim_technician t
+ON f.technician_id = t.technician_id
+GROUP BY t.technician_name
+ORDER BY assigned_calls DESC
+LIMIT 10;
+
+/* TECHNICIAN PRODUCTIVITY */
+SELECT 
+    t.technician_name,
+
+    COUNT(*) AS total_calls,
+
+    SUM(CASE 
+        WHEN f.status = 'Closed' THEN 1 
+        ELSE 0 
+    END) AS closed_calls,
+
+    SUM(CASE 
+        WHEN f.status IN ('Open', 'Pending', 'Assigned') THEN 1 
+        ELSE 0 
+    END) AS active_calls,
+
+    SUM(CASE 
+        WHEN f.repeat_call_flag = 'Yes' THEN 1 
+        ELSE 0 
+    END) AS repeat_calls,
+
+    ROUND(
+        (
+            SUM(CASE 
+                WHEN f.status = 'Closed' THEN 1 
+                ELSE 0 
+            END)
+            / COUNT(*)
+        ) * 100,
+        2
+    ) AS productivity_percentage
+
+FROM fact_pending_calls f
+
+JOIN dim_technician t
+ON f.technician_id = t.technician_id
+
+GROUP BY t.technician_name
+
+ORDER BY productivity_percentage DESC,
+         closed_calls DESC;
+         
+/* REPEAT CALL ANALYSIS */
+SELECT 
+    repeat_call_flag,
+    COUNT(*) AS total_calls
+FROM fact_pending_calls
+GROUP BY repeat_call_flag;
+
+/* PENDING ANALYSIS */
+SELECT 
+    pending_reason,
+    COUNT(*) AS total_cases
+FROM fact_pending_calls
+GROUP BY pending_reason
+ORDER BY total_cases DESC;
